@@ -1,0 +1,23 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import LabelEncoder
+
+# Загрузка и предобработка
+df = pd.read_csv("train.csv")
+df = df.drop(["PassengerId", "Name", "Ticket", "Cabin"], axis=1)
+df["Embarked"].fillna(df["Embarked"].mode()[0], inplace=True)
+df["Age"].fillna(df["Age"].median(), inplace=True)
+df["Sex"] = LabelEncoder().fit_transform(df["Sex"])
+df["Embarked"] = LabelEncoder().fit_transform(df["Embarked"])
+# Модель
+X = df.drop("Survived", axis=1)
+y = df["Survived"]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train, y_train)
+preds = model.predict(X_test)
+
+print("KNN Accuracy:", accuracy_score(y_test, preds))
