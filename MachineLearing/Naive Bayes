@@ -1,0 +1,28 @@
+import pandas as pd
+ from sklearn.model_selection import train_test_split
+ from sklearn.preprocessing import LabelEncoder
+ from sklearn.naive_bayes import GaussianNB
+ from sklearn.metrics import accuracy_score
+
+ # Загрузка и предобработка данных
+ df = pd.read_csv("train.csv")
+ df = df.drop(["PassengerId", "Name", "Ticket", "Cabin"], axis=1)
+ df["Embarked"].fillna(df["Embarked"].mode()[0], inplace=True)
+ df["Age"].fillna(df["Age"].median(), inplace=True)
+
+ # Кодировка категориальных признаков
+ df["Sex"] = LabelEncoder().fit_transform(df["Sex"])
+ df["Embarked"] = LabelEncoder().fit_transform(df["Embarked"])
+
+ # Разделение данных
+ X = df.drop("Survived", axis=1)
+ y = df["Survived"]
+ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+ # Обучение модели Naive Bayes (GaussianNB)
+ model = GaussianNB()
+ model.fit(X_train, y_train)
+
+ # Предсказание и оценка
+ preds = model.predict(X_test)
+ print("Naive Bayes Accuracy:", accuracy_score(y_test, preds))
